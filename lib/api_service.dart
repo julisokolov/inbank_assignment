@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 // to the decision engine.
 class ApiService {
   final String _baseUrl = 'http://localhost:8080';
+  String responseAge = '';
   String responseAmount = '';
   String responsePeriod = '';
   String responseError = '';
@@ -16,12 +17,13 @@ class ApiService {
   // requestLoanDecision sends a request to the API to get a loan decision
   // based on the provided personalCode, loanAmount, and loanPeriod.
   Future<Map<String, String>> requestLoanDecision(
-      String personalCode, int loanAmount, int loanPeriod) async {
+      String personalCode, int age, int loanAmount, int loanPeriod) async {
     final response = await httpClient.post(
       Uri.parse('$_baseUrl/loan/decision'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'personalCode': personalCode,
+        'age': age,
         'loanAmount': loanAmount,
         'loanPeriod': loanPeriod,
       }),
@@ -30,12 +32,14 @@ class ApiService {
     try {
       // Decode the API response and update response data variables
       final responseData = jsonDecode(response.body) as Map<String, dynamic>;
+      responseAge = responseData['age'].toString();
       responseAmount = responseData['loanAmount'].toString();
       responsePeriod = responseData['loanPeriod'].toString();
       responseError = responseData['errorMessage'].toString();
 
       // Return the response data as a map, handling null values if necessary
       return {
+        'age': responseAge != 'null' ? responseAge : '0',
         'loanAmount': responseAmount != 'null' ? responseAmount : '0',
         'loanPeriod': responsePeriod != 'null' ? responsePeriod : '0',
         'errorMessage': responseError != 'null' ? responseError : '',
@@ -44,6 +48,7 @@ class ApiService {
       // An unexpected error occurred when querying the server,
       // so an error is displayed.
       return {
+        'age': '0',
         'loanAmount': '0',
         'loanPeriod': '0',
         'errorMessage': 'An unexpected error occurred.',

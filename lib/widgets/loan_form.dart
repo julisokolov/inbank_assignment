@@ -22,6 +22,7 @@ class _LoanFormState extends State<LoanForm> {
   final _formKey = GlobalKey<FormState>();
   final _apiService = ApiService();
   String _nationalId = '';
+  int _age = 30;
   int _loanAmount = 2500;
   int _loanPeriod = 36;
   int _loanAmountResult = 0;
@@ -33,7 +34,7 @@ class _LoanFormState extends State<LoanForm> {
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       final result = await _apiService.requestLoanDecision(
-          _nationalId, _loanAmount, _loanPeriod);
+          _nationalId, _age, _loanAmount, _loanPeriod);
       setState(() {
         int tempAmount = int.parse(result['loanAmount'].toString());
         int tempPeriod = int.parse(result['loanPeriod'].toString());
@@ -88,7 +89,46 @@ class _LoanFormState extends State<LoanForm> {
                       );
                     },
                   ),
-                  const SizedBox(height: 60.0),
+                  const SizedBox(height: 16.0),
+                  Text('Age: $_age'),
+                  const SizedBox(height: 8),
+                  Slider.adaptive(
+                    value: _age.toDouble(),
+                    min: 0,
+                    max: 100,
+                    divisions: 100,
+                    label: '$_age',
+                    activeColor: AppColors.secondaryColor,
+                    onChanged: (double newValue) {
+                      setState(() {
+                        _age = newValue.round();
+                        _submitForm();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 4),
+                  const Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 12),
+                          child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text('0')),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(right: 12),
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text('100'),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 16.0),
                   Text('Loan Amount: $_loanAmount €'),
                   const SizedBox(height: 8),
                   Slider.adaptive(
@@ -106,8 +146,8 @@ class _LoanFormState extends State<LoanForm> {
                     },
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    children: const [
+                  const Row(
+                    children: [
                       Expanded(
                         child: Padding(
                           padding: EdgeInsets.only(left: 12),
@@ -145,14 +185,14 @@ class _LoanFormState extends State<LoanForm> {
                     },
                   ),
                   const SizedBox(height: 4),
-                  Row(
-                    children: const [
+                  const Row(
+                    children: [
                       Expanded(
                         child: Padding(
                           padding: EdgeInsets.only(left: 12),
                           child: Align(
                               alignment: Alignment.centerLeft,
-                              child: Text('6 months')),
+                              child: Text('12 months')),
                         ),
                       ),
                       Expanded(
